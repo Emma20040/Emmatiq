@@ -1,0 +1,189 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+{% if profile %}
+
+<div class= "container text-center" >
+    <div class= "row">
+        <div class ="col-8"> <h1> {{ profile.user.username }}'s Profile page</h1>
+           <br/>
+           
+                    {% if posts %}
+                        {% for post in posts %}
+                          <div class="alert alert-dark" role="alert">
+                            
+                        <div class= "container">
+                          <div class= "row">
+                            <div class= "col-1">
+                            {% if profile.profile_pic %}
+                            <img src= "{{ profile.profile_pic.url }}" withd= 50 height= 50 class="rounded-circle" alt= "{{ profile.user.username }}">
+                            {% else %}
+                            {% comment %} default profile pic if user doesn't have one {% endcomment %}
+                             <img src= "{% static 'images/profile_pic.jpeg' %}" withd= 50 height=50 class="rounded-circle" alt= "{{ profile.user.username }}">
+        
+                            {%endif%}
+
+                          </div>
+
+                          <div class="11">
+{% comment %} post {% endcomment %}
+                              {{post.body}}<br/>
+                              <small class="text-muted">
+                                  {{post.created_at}} by 
+                                  @{{post.user.username}}
+{% comment %} likes {% endcomment %}
+                                  -{{post.number_of_likes}} Likes 
+                                  {% if user in post.likes.all %}
+                                    <a href="{% url 'post-like' post.id %}"> 
+                                      <i class="fa-solid fa-heart" style= "color: red"></i>
+                                    </a>
+                                    {%else%}
+                                    <a href="{% url 'post-like' post.id %}"> 
+                                      <i class="fa fa-heart-o" style= "color: red"></i>
+                                    </a>
+                                    {%endif%}
+                                    &nbsp;
+                                    {% comment %} share button {% endcomment %}
+                                      <a href="{% url 'share-post' post.id %}">
+                                        <i class="fa-solid fa-share" style= "color: blue"></i>
+                                    </a>
+                                    &nbsp;
+                                    {% if request.user.username == profile.user.username %}
+                                    {% comment %} delete post {% endcomment %}
+                                    <a href="{% url 'delete-post' post.id %}">
+                                      <i class="fa-regular fa-trash-can" style= "color: blue"></i>
+                                  </a>
+                                  &nbsp;
+                                  {% comment %} edit post {% endcomment %}
+                                  <a href="{% url 'edit-post' post.id %}">
+                                    <i class="fa-regular fa-edit" style= "color: blue"></i>
+                                </a>
+                                  {%endif%}
+                                  
+                              </small>
+                          </div><br/><br/>
+                        </div>
+                      </div>
+                    </div>
+                        {% endfor %}
+                    {% endif %}
+                        </div>
+            <div class = "col-4">
+                <br/><br/><br/>
+
+                {% if profile.profile_pic %}
+                <img src= "{{profile.profile_pic.url}}" class= "rounded-circle" alt="" width="200" height="200">
+                <br/><br/>
+                {% endif %}
+
+                {% if profile.profile_bio %}
+                <p align="justify"> {{profile.profile_bio}}</p>
+                {%endif%}
+                
+                 
+                {% if profile.twitter_link %}
+                 <a href="{{profile.twitter_link}}" target= "new">
+                  <i class="fab fa-twitter"></i>
+                   </a>
+                {%endif%}
+                &nbsp; &nbsp;
+
+                {% if profile.github_link %}
+                <a href="{{profile.github_link}}" target= "new">
+                  <i class="fa-brands fa-github"  style= "color: grey"></i>
+                </a>
+                {%endif%}
+                &nbsp; &nbsp;
+
+                {% if profile.linkedln_link %}
+                 <a href="{{profile.linkedln_link}}" target= "new">
+                  <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+                {%endif%}
+                &nbsp; &nbsp;
+
+                {% if profile.portfolio_link %}
+                <a href="{{profile.portfolio_link}}" target= "new">
+                  <i class="fas fa-link"  ></i>
+                </a>
+                {%endif%}
+                &nbsp; &nbsp;
+
+                <div class="card">
+                    <h5 class="card-header">Follows</h5>
+                    <div class="card-body">
+                      
+                      <p class="card-text">
+
+                          {% for following in profile.follows.all|slice:2 %}
+                          <a href="{% url 'profile' following.user.id %}"> @{{following |lower}}</a>
+                          <a href="{% url 'unfollow' following.user.id %}"><i class="fas fa-circle-minus" style= "color: red" ></i></a><br/>
+                          {% endfor %}
+                      </p>
+                     
+                    </div>
+                    <div class="card-footer"> 
+                      <a href="{% url 'follows' profile.user.id %}" class= "btn btn-sm btn-outline-primary"> See All</a>
+                    </div>
+                  </div>
+{% comment %} <strong> follows </strong><br/> {% endcomment %}
+
+<br/><br/>
+
+<div class="card">
+    <h5 class="card-header">Followed by</h5>
+    <div class="card-body">
+      
+      <p class="card-text">
+
+          {% for following in profile.followed_by.all|slice:2 %}
+          <a href="{% url 'profile' following.user.id %}"> @{{following | lower}}</a>
+          &nbsp;
+          {% if following in profile.follows.all %}
+          <a href="{% url 'unfollow' following.user.id %}">
+            <i class="fas fa-user-minus" style= "color: grey" ></i>unfollow</a>
+          {%else%}
+          <a href="{% url 'follow' following.user.id %}">
+            <i class="fas fa-user-plus" style= "color: grey" ></i>follow</a>
+          &nbsp;
+          {%endif%}
+          <br/>
+          {% endfor %}
+          <br/>
+           
+        </p>
+        
+      </div>
+
+      <div class="card-footer"> 
+        <a href="{% url 'followers' profile.user.id %}" class= "btn btn-sm btn-outline-primary"> See All</a>
+      </div>
+  </div>
+<br/>
+<form method= "POST">
+{% csrf_token %}
+{% if profile in user.profile.follows.all %}
+    <button class="btn btn-outline-danger" name= "follow"
+    value= "unfollow" type= "submit">
+      unfollow @{{profile.user.username | lower}}
+</button>
+
+{%  else %}
+<button class="btn btn-outline-success" name= "follow"
+value= "follow" type= "submit">
+  follow @{{profile.user.username | lower}}
+</button>
+{% endif %}
+</form>
+<br/>
+
+{% comment %} makes sures users can update only their profiles  {% endcomment %}
+{% if request.user.id == profile.user.id %}
+<a href= "{% url 'update_user' %}" class="btn btn-outline-primary"> Update profile </a>
+{% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,63 @@
+{% extends "main.html" %}
+{% load static %}
+{% block content %}
+
+<div class= "container text-center" >
+    <div class= "row">
+        <div class ="col-8">
+
+<h1>EMMATIQ POST</h1>
+<br/>
+{% for post in posts %}
+<div class="alert alert-dark" role="alert">
+<div class= "container">
+    <div class= "row">
+       <div class= "col-1">
+        
+        {% if post.user.profile.profile_pic %}
+        <img src= "{{ post.user.profile.profile_pic.url }}" withd= 50 height= 50 class="rounded-circle" alt= "{{ profile.user.username }}">
+        {% else %}
+         <img src= "{% static 'images/profile_pic.jpeg' %}" withd= 50 height=50 class="rounded-circle" alt= "{{ profile.user.username }}">
+
+        {%endif%}
+       </div>
+
+       <div class="11">
+    {{post.body}}<br/>
+    <small class="text-muted">
+        {{post.created_at}} by 
+        @{{post.user.username}}
+        &nbsp;
+        {{post.number_of_likes}} Likes 
+        {% if user in post.likes.all %}
+        <a href="{% url 'post-like' post.id %}"> 
+            <i class="fa-solid fa-heart" style= "color: red"></i>
+        </a>
+        {%else%}
+        <a href="{% url 'post-like' post.id %}"> 
+            <i class="fa fa-heart-o" style= "color: red"></i>
+        </a>
+        
+        {%endif%}
+        &nbsp;
+        <a href="{% url 'share-post' post.id %}">
+          <i class="fa-solid fa-share" style= "color: blue"></i>
+       </a>
+    </small>
+</div><br/><br/>
+        </div>
+   </div>
+</div>
+{% endfor %}
+</div>
+<div class = "col-4">
+{% if form %}
+    <form method= "POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-secondary">Post</button>
+      </form>
+    <br/><br/><br/>
+{% endif  %}
+</div>
+{% endblock content %}
