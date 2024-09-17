@@ -26,7 +26,7 @@
         {% comment %} adding images to the post {% endcomment %}
         <p>{{post.body}}</p><br/>
         {% if post.image %}
-            <img src="{{ post.image.url }}" alt="Image" width="400" height="400" class="img-fluid">
+            <img src="{{ post.image.url }}" alt="Image" width="300" height="300" class="img-fluid">
         {% else %}
             
         {% endif %}<br/>
@@ -56,8 +56,9 @@
 </div>
 {% endfor %}
 </div>
+
 {% comment %}  form to create a post {% endcomment %}
-<div class = "col-4">
+{% comment %} <div class = "col-4">
     {% if form %}
     <form method= "POST" enctype="multipart/form-data" >
         {% csrf_token %}
@@ -66,6 +67,6 @@
       </form>
     <br/><br/><br/>
 {% endif  %}
-</div>
+</div> {% endcomment %}
 
 {% endblock content %}

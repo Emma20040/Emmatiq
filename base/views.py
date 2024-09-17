@@ -10,7 +10,14 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 
 
+
 def home(request):
+    posts=Post.objects.all().order_by("-created_at")
+    context={"posts":posts}
+    return render(request, 'base/home.html', context)
+
+
+def create_post(request):
     if request.user.is_authenticated:
         form= PostForm()
         if request.method== "POST":
@@ -21,13 +28,14 @@ def home(request):
                 post.save()
                 messages.success(request,('Your post was successfully created'))
                 return redirect('home')
-        posts= Post.objects.all().order_by("-created_at")
-        context= {'posts':posts, 'form':form} 
-        return render(request, 'base/home.html', context)
+        # posts= Post.objects.all().order_by("-created_at")
+        context= {'form':form} 
+        return render(request, 'base/create_post.html', context)
     else:
-        posts= Post.objects.all().order_by("-created_at")
-        context= {'posts':posts}   
-        return render(request, 'base/home.html', context)
+        messages.success(request, ('You must be login to post'))
+        # posts= Post.objects.all().order_by("-created_at")
+        # context= {'posts':posts}   
+        return redirect('login')
 # Create your views here.
 
 

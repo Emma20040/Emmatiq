@@ -20,4 +20,6 @@ urlpatterns = [
     path('search', views.search, name='search'),
     path('search_user', views.search_user, name='search_user'),
 
+    path('create-post', views.create_post, name='create-post'),
+
 ]
