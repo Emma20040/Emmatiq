@@ -10,6 +10,7 @@ class Post(models.Model):
         on_delete= models.DO_NOTHING
     )
     body= models.CharField(max_length=200)
+    image= models.ImageField(upload_to=('static/images/'), blank=True, null=True)
     created_at= models.DateTimeField(auto_now_add=True)
     likes= models.ManyToManyField(User, related_name='post_like', blank= True)
 

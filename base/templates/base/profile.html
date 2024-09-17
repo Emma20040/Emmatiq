@@ -71,17 +71,17 @@
                         </div>
             <div class = "col-4">
                 <br/><br/><br/>
-
+{% comment %} shows the round profile picture at the top right of the page  {% endcomment %}
                 {% if profile.profile_pic %}
                 <img src= "{{profile.profile_pic.url}}" class= "rounded-circle" alt="" width="200" height="200">
                 <br/><br/>
                 {% endif %}
-
+{% comment %} show user bio {% endcomment %}
                 {% if profile.profile_bio %}
                 <p align="justify"> {{profile.profile_bio}}</p>
                 {%endif%}
                 
-                 
+                 {% comment %} Twitter link {% endcomment %}
                 {% if profile.twitter_link %}
                  <a href="{{profile.twitter_link}}" target= "new">
                   <i class="fab fa-twitter"></i>
@@ -109,7 +109,7 @@
                 </a>
                 {%endif%}
                 &nbsp; &nbsp;
-
+{% comment %} shows the people I'm following {% endcomment %}
                 <div class="card">
                     <h5 class="card-header">Follows</h5>
                     <div class="card-body">
@@ -117,12 +117,14 @@
                       <p class="card-text">
 
                           {% for following in profile.follows.all|slice:2 %}
+                          {% comment %} slice allows me to display on 2 profiles {% endcomment %}
                           <a href="{% url 'profile' following.user.id %}"> @{{following |lower}}</a>
                           <a href="{% url 'unfollow' following.user.id %}"><i class="fas fa-circle-minus" style= "color: red" ></i></a><br/>
                           {% endfor %}
                       </p>
                      
                     </div>
+                    {% comment %} it takes me to the page to shw me the profiles that i'm following {% endcomment %}
                     <div class="card-footer"> 
                       <a href="{% url 'follows' profile.user.id %}" class= "btn btn-sm btn-outline-primary"> See All</a>
                     </div>
@@ -131,6 +133,7 @@
 
 <br/><br/>
 
+{% comment %} shows the profiles following me {% endcomment %}
 <div class="card">
     <h5 class="card-header">Followed by</h5>
     <div class="card-body">
@@ -140,6 +143,7 @@
           {% for following in profile.followed_by.all|slice:2 %}
           <a href="{% url 'profile' following.user.id %}"> @{{following | lower}}</a>
           &nbsp;
+          {% comment %} show the follow icon if i am not following profile or else showsthe follow icon {% endcomment %}
           {% if following in profile.follows.all %}
           <a href="{% url 'unfollow' following.user.id %}">
             <i class="fas fa-user-minus" style= "color: grey" ></i>unfollow</a>
@@ -161,6 +165,7 @@
       </div>
   </div>
 <br/>
+{% comment %} show the the follow button or unfollow of the profile I'm looking  {% endcomment %}
 <form method= "POST">
 {% csrf_token %}
 {% if profile in user.profile.follows.all %}

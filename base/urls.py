@@ -19,4 +19,5 @@ urlpatterns = [
     path('edit-post/<int:pk>', views.edit_post, name='edit-post'),
     path('search', views.search, name='search'),
     path('search_user', views.search_user, name='search_user'),
+
 ]

@@ -33,9 +33,17 @@ class PostForm(forms.ModelForm):
                            ),
                            label=""
                            )
-    
+    image= forms.ImageField(required=False,
+                           widget=forms.widgets.FileInput(
+                               attrs={"placeholder": "upload your image here",
+                                      "class": "form-control",}
+                           ),
+                           label=""
+                           )
+
     class Meta:
         model = Post
+        fields= ['body', 'image']
         exclude =("user", "likes",)
 
 

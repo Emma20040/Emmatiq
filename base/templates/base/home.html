@@ -13,7 +13,7 @@
 <div class= "container">
     <div class= "row">
        <div class= "col-1">
-        
+        {% comment %} profile pic attarched to post {% endcomment %}
         {% if post.user.profile.profile_pic %}
         <img src= "{{ post.user.profile.profile_pic.url }}" withd= 50 height= 50 class="rounded-circle" alt= "{{ profile.user.username }}">
         {% else %}
@@ -21,9 +21,15 @@
 
         {%endif%}
        </div>
-
+{% comment %} post body {% endcomment %}
        <div class="11">
-    {{post.body}}<br/>
+        {% comment %} adding images to the post {% endcomment %}
+        <p>{{post.body}}</p><br/>
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Image" width="400" height="400" class="img-fluid">
+        {% else %}
+            
+        {% endif %}<br/>
     <small class="text-muted">
         {{post.created_at}} by 
         @{{post.user.username}}
@@ -50,9 +56,10 @@
 </div>
 {% endfor %}
 </div>
+{% comment %}  form to create a post {% endcomment %}
 <div class = "col-4">
-{% if form %}
-    <form method= "POST">
+    {% if form %}
+    <form method= "POST" enctype="multipart/form-data" >
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-secondary">Post</button>
@@ -60,4 +67,5 @@
     <br/><br/><br/>
 {% endif  %}
 </div>
+
 {% endblock content %}

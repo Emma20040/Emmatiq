@@ -6,7 +6,7 @@
     <div class= "row">
         <div class ="col-8">
 
-<h1>SHARE</h1>
+<h1>Share post</h1>
 <br/>
 
 <div class="alert alert-dark" role="alert">
@@ -21,7 +21,7 @@
 
         {%endif%}
        </div>
-
+{% comment %} post body {% endcomment %}
        <div class="11">
     {{post.body}}<br/>
     <small class="text-muted">
@@ -46,6 +46,7 @@
 
 </div>
 <div class = "col-4">
+    {% comment %} share form {% endcomment %}
 {% if form %}
     <form method= "POST">
         {% csrf_token %}

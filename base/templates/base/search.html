@@ -4,7 +4,7 @@
 {% block content %}
 
 
-<h1>Search</h1>
+<h1>Search a post</h1>
 <br/>
 	
 
@@ -33,7 +33,7 @@
 				<img src="{% static 'images/profile_pic.jpeg' %}" width=50 height=50 class="rounded-circle" alt="{{ profile.user.username }}">	
 				{% endif %}
 		</div>
-
+{% comment %} post body {% endcomment %}
 		<div class="col-11">
 		  {{ post.body }}<br/>
 		  <small class="text-muted">

@@ -7,12 +7,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django import forms 
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 
 def home(request):
     if request.user.is_authenticated:
-        form= PostForm(request.POST or None)
+        form= PostForm()
         if request.method== "POST":
+            form= PostForm(request.POST, request.FILES)
             if form.is_valid():
                 post= form.save(commit=False)
                 post.user= request.user
@@ -278,3 +280,6 @@ def search_user(request):
 		return render(request, 'base/search_user.html', {'search':search, 'searched':searched})
 	else:
 		return render(request, 'base/search_user.html', {}) 
+    
+
+

@@ -7,7 +7,7 @@
 <h1>Search Profile</h1>
 <br/>
 	
-
+{% comment %} search form {% endcomment %}
 <form  method=POST>
 {% csrf_token %}
 <input type="input" class="form-control"  placeholder="Search" name="search">
@@ -18,7 +18,7 @@
 <br/><br/>
 
 {% if search %}
-<h3>You Searched For: {{ search }}</h3>
+<h3>Search Results: {{ search }}</h3>
 <br/>
 
 {% endif %}
@@ -53,9 +53,11 @@
     
     {% endfor%}
 {% else %}
+{% comment %} checks to see if your query exist in the database {% endcomment %}
 {% if searched == None %}
 
 {%else%}
+{% comment %} else displays that is not registered {% endcomment %}
 No user has the name: {{ search }}
 {% endif %} 
 {%endif%}

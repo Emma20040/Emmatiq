@@ -9,12 +9,12 @@
 <div class="card mb-3" style="max-width: 540px;">
     <div class="row g-0">
       <div class="col-md-4">
-
+ {% comment %} show profile of users withe profile pic {% endcomment %}
         {% if profile.profile_pic %}
         <img src= "{{ profile.profile_pic.url }}" withd= 200 height=200 class="img-fluid rounded-start" alt= "{{ profile.user.username }}">
         {%else%}
 
-
+{% comment %} show default profile profile pictures for users that don't have a profile pic {% endcomment %}
         <img src="{% static 'images/profile_pic.jpeg' %}" class="img-fluid rounded-start" alt="Profile image">
         {% endif %}
       </div>
@@ -22,9 +22,11 @@
         <div class="card-body">
           <h5 class="card-title">{{ profile.user.username }}
             {% if profile in profiles.follows.all %}
+            {% comment %} check if you are already following the user then displays unfollow {% endcomment %}
           <a href="{% url 'unfollow' profile.user.id %}">
             <i class="fas fa-user-minus" style= "color: grey" ></i>unfollow</a>
           {%else%}
+          {% comment %} else displays follow  {% endcomment %}
           <a href="{% url 'follow' profile.user.id %}">
             <i class="fas fa-user-plus" style= "color: grey" ></i>follow</a>
           &nbsp;

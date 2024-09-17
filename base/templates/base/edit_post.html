@@ -6,14 +6,14 @@
     <div class= "row">
         <div class ="col-8">
 
-<h1>SHARE</h1>
+<h1>Edit Post</h1>
 <br/>
 
 <div class="alert alert-dark" role="alert">
 <div class= "container">
     <div class= "row">
        <div class= "col-1">
-        
+        {% comment %} checks if user has profile or else display default profile pic {% endcomment %}
         {% if post.user.profile.profile_pic %}
         <img src= "{{ post.user.profile.profile_pic.url }}" withd= 50 height= 50 class="rounded-circle" alt= "{{ profile.user.username }}">
         {% else %}
@@ -21,7 +21,7 @@
 
         {%endif%}
        </div>
-
+{% comment %} display the body of the original post {% endcomment %}
        <div class="11">
     {{post.body}}<br/>
     <small class="text-muted">
@@ -44,7 +44,7 @@
    </div>
 </div>
 
-
+{% comment %} submission form for editing the post {% endcomment %}
 {% if form %}
 <form method= "POST">
     {% csrf_token %}

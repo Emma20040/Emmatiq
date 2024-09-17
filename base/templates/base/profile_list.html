@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block content %}
+
 <h1> Profile list </h1>
 <br/>
 {%  if profiles %}
@@ -14,7 +15,7 @@
         <img src= "{{ profile.profile_pic.url }}" withd= 200 height=200 class="img-fluid rounded-start" alt= "{{ profile.user.username }}">
         {%else%}
 
-
+{% comment %} else display default profile pic {% endcomment %}
         <img src="{% static 'images/profile_pic.jpeg' %}" class="img-fluid rounded-start" alt="Profile image">
         {% endif %}
       </div>
