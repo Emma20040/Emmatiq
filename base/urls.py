@@ -22,4 +22,7 @@ urlpatterns = [
 
     path('create-post', views.create_post, name='create-post'),
 
+    # email settings
+    path('activate/<uidb64>/<token>', views.activate, name='activate'),
+
 ]
