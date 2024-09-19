@@ -109,13 +109,31 @@ p {
 {% comment %} Trending Topics {% endcomment %}
 <div class = "col-4">
     <h2>Trending Topics</h2>
-    <div>
-      
+                          
+{% comment %}       
         <p>Best T-shirt for men</p>
         <img src= "{% static 'images/nose.jpeg' %}"  width="300" height="300"  alt="shoes" class="responsive-img">
        
         <p>Best sneakers for men</p>
-               <img src= "{% static 'images/nike.jpg' %}"  width="300" height="300"  alt="shoes" class="responsive-img">
-               
+               <img src= "{% static 'images/nike.jpg' %}"  width="300" height="300"  alt="shoes" class="responsive-img"> {% endcomment %}
+               <ul>
+                
+                {% for trending_post in trending_post %}
+                
+                <li>
+                    {% if trending_post.image %}
+                        <img src="{{ trending_post.image.url }}" alt="Trending Post Image" width="300" height="200" class="img-fluid">
+                    {% else %}
+                        
+                    {% endif %}
+                    
+                <p>{{ trending_post.body|truncatewords:20 }}</p>
+    
+                <p>Likes:{{trending_post.number_of_likes}}</p>
+                    </li>
+                     
+                {% endfor %}
+            </ul>
            </div > 
+        
 {% endblock content %}

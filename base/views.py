@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django import forms 
 from django.contrib.auth.models import User
+from django.db.models import Count
 # email settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -16,14 +17,19 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from .tokens import account_activation_token
+# reset password
+from .forms import SetPasswordForm, PasswordResetForm
+from django.db.models.query_utils import Q
 
 
 def home(request):
     posts=Post.objects.all().order_by("-created_at")
-    context={"posts":posts}
+    trending_post = Post.objects.all().annotate(num_likes=Count('likes')).order_by('-num_likes')[:5] 
+    context={"posts":posts, "trending_post":trending_post}
     return render(request, 'base/home.html', context)
 
 
+# view that users to create a post
 def create_post(request):
     if request.user.is_authenticated:
         form= PostForm()
@@ -46,6 +52,7 @@ def create_post(request):
 # Create your views here.
 
 
+# list of all user in the system
 def profile_list(request):
     if request.user.is_authenticated:
         profiles = Profile.objects.exclude(user= request.user)
@@ -57,6 +64,7 @@ def profile_list(request):
         return redirect('home')
     
 
+# user profile
 def profile(request, pk):
     if request.user.is_authenticated:
         profile= Profile.objects.get(user_id=pk)
@@ -190,6 +198,7 @@ def register_user(request):
 #     return render(request, 'base/register.html', context)
 
 
+# view to update user profile
 def update_user(request):
     if request.user.is_authenticated:
         current_user= User.objects.get(id=request.user.id)
@@ -211,6 +220,7 @@ def update_user(request):
         return redirect('home')
 
 
+# allow user to follow to profile
 def follow(request, pk):
     if request.user.is_authenticated:
         #get the user profile to follow
@@ -225,6 +235,7 @@ def follow(request, pk):
         return redirect('home')
 
 
+# allows user to unfollow profiles
 def unfollow(request, pk):
     if request.user.is_authenticated:
         #get the user profile to unfollow
@@ -239,6 +250,7 @@ def unfollow(request, pk):
         return redirect('home')
 
 
+# shows the list of every profile following you
 def followers(request, pk):
     if request.user.is_authenticated:
         if request.user.id== pk:
@@ -254,6 +266,7 @@ def followers(request, pk):
         return redirect('home')
 
 
+# list of everry profile that you are following 
 def follows(request, pk):
     if request.user.is_authenticated:
         if request.user.id== pk:
@@ -269,6 +282,7 @@ def follows(request, pk):
         return redirect('home')
 
 
+# allow users to like a post
 def post_like(request, pk):
     if request.user.is_authenticated:
         post= get_object_or_404(Post, id=pk)
@@ -284,6 +298,7 @@ def post_like(request, pk):
         return redirect('home')
     
 
+     # allows user to share a post 
 def share_post(request, pk):
     post= get_object_or_404(Post, id=pk)
     if post:
@@ -330,13 +345,14 @@ def edit_post(request, pk):
                 
             
         else:
-            messages.success(request, ("you can't delete this post becuase it is not your post"))
+            messages.success(request, ("you can't edit this post becuase it is not your post"))
             return redirect('home')
     else:
-        messages.success(request, ("Only owners of the post can delete"))
+        messages.success(request, ("Only owners of the post are allowed to edit"))
         return redirect('home')
     
 
+# view to allows user to search a post in the database
 def search(request):
 	if request.method == "POST":
 		# Grab the form field input
@@ -349,17 +365,109 @@ def search(request):
 		return render(request, 'base/search.html', {}) 
     
 
-
+# allows user to search another profile
 def search_user(request):
 	if request.method == "POST":
 		# Grab the form field input
 		search = request.POST['search']
 		# Search the database
 		searched = User.objects.filter(username__contains = search)
-
+        
 		return render(request, 'base/search_user.html', {'search':search, 'searched':searched})
 	else:
 		return render(request, 'base/search_user.html', {}) 
     
 
 
+# reset password view
+
+def password_change(request):
+    user = request.user
+    if request.method == 'POST':
+        form = SetPasswordForm(user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your password has been successfully changed")
+            return redirect('login')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    form = SetPasswordForm(user)
+    context ={'form': form}
+    return render(request, 'base/confirm_password_reset.html', context)
+
+
+
+
+def password_reset_request(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            user_email = form.cleaned_data['email']
+            associated_user = get_user_model().objects.filter(Q(email=user_email)).first()
+            if associated_user:
+                subject = "Password Reset request"
+                message = render_to_string("base/password_reset_template.html", {
+                    'user': associated_user,
+                    'domain': get_current_site(request).domain,
+                    'uid': urlsafe_base64_encode(force_bytes(associated_user.pk)),
+                    'token': account_activation_token.make_token(associated_user),
+                    "protocol": 'https' if request.is_secure() else 'http'
+                })
+                email = EmailMessage(subject, message, to=[associated_user.email])
+                if email.send():
+                    messages.success(request,
+                        """
+                        Password reset sent
+                        
+                            We've emailed you instructions for setting your password, if an account exists with the email you entered. 
+                            You should receive them shortly. If you don't receive an email, please make sure you've entered the address 
+                            you registered with, and check your spam folder.
+                        
+                        """
+                    )
+                else:
+                    messages.error(request, "Problem sending reset password email, <b>SERVER PROBLEM</b>")
+
+            return redirect('home')
+
+        for key, error in list(form.errors.items()):
+            if key == 'captcha' and error[0] == 'This field is required.':
+                messages.error(request, "You must pass the reCAPTCHA test")
+                continue
+
+    form = PasswordResetForm()
+    context= {"form": form}
+    return render( request, "base/password_reset.html", context)
+
+
+
+
+def passwordResetConfirm(request, uidb64, token):
+    User = get_user_model()
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except:
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Your password has been set. You may go ahead and <b>log in </b> now.")
+                return redirect('home')
+            else:
+                for error in list(form.errors.values()):
+                    messages.error(request, error)
+
+        form = SetPasswordForm(user)
+        context= {'form': form}
+        return render(request, 'base/confirm_password_reset.html', context)
+    else:
+        messages.error(request, "Link is expired")
+
+    messages.error(request, 'Something went wrong, redirecting back to Homepage')
+    return redirect("home")

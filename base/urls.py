@@ -25,4 +25,9 @@ urlpatterns = [
     # email settings
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
 
+    #change passwords urls
+    path("password_change", views.password_change, name="change_password"),
+    path("password_reset", views.password_reset_request, name="password_reset"),
+    path('reset/<uidb64>/<token>', views.passwordResetConfirm, name='password_reset_confirm'),
+
 ]
